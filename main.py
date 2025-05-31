@@ -1,5 +1,3 @@
-
-from encrypted_functions import EncryptedFunctions
 from haversine_manager import haversine
 from tenseal_manager import *
 
@@ -21,15 +19,3 @@ enc_dist = haversine(
 )
 print(enc_dist.decrypt())
 
-"""
-calculator = EncryptedFunctions(enc_consts)
-rad = calculator.enc_radians(lyon_enc[0])
-print(rad.decrypt())
-sqr = calculator.enc_asin(rad)
-print(sqr.decrypt())
-rad1 = lyon[0]*math.pi/180
-print(rad1)
-res = math.asin(rad1)
-print(res)
-
-"""

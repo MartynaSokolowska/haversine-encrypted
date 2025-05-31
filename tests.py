@@ -88,13 +88,8 @@ class TestEncryptedHaversine(unittest.TestCase):
             lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
             dlon = lon2 - lon1
             dlat = lat2 - lat1
-            # print("PLAIN: lon1, lat1, lon2, lat2, dlon, dlat: ", lon1, lat1, lon2, lat2, dlon, dlat )
             a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-            # print("plain sin dlat, sin sqrt dlat, sin dlon, sin sqrt dlon: ", math.sin(dlat/2), math.sin(dlat/2)**2, math.sin(dlon/2), math.sin(dlon/2)**2)
-            # print("plain cos lat1, cos lat2: ", math.cos(lat1), math.cos(lat2))
-            # print("plain a, sqrt a, asin a ", a, math.sqrt(a), math.asin(math.sqrt(a)))
             c = 2 * math.asin(math.sqrt(a))
-            # print("plain c ", c)
             return 6371 * c
 
         expected = plain_haversine(*place1, *place2)
