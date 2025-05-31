@@ -1,6 +1,3 @@
-import numpy as np
-from numpy.polynomial.chebyshev import Chebyshev
-
 class EncryptedFunctions():
     def __init__(self, enc_consts):
         self.enc_consts = enc_consts
