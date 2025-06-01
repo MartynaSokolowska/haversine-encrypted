@@ -2,9 +2,9 @@ import unittest
 import math
 import tenseal as ts
 from encrypted_functions import EncryptedFunctions
-from haversine_manager import haversine
+from haversine_manager import enc_haversine
 from tenseal_manager import create_ckks_context, encrypt_constants, encrypt_places, consts
-
+from haversine import haversine, Unit
 
 
 class TestEncryptedFunctions(unittest.TestCase):
@@ -77,22 +77,15 @@ class TestEncryptedHaversine(unittest.TestCase):
     def test_enc_haversine(self):
         context = create_ckks_context()
 
-        place1 = (4.8422, 45.7597)         
-        place2 = (2.3508, 48.8567) 
+        place1 = (21.0122, 52.2297)       
+        place2 = (21.2122, 52.2197)
+
         (enc_lon1, enc_lat1), (enc_lon2, enc_lat2) = encrypt_places(place1, place2, context)
 
-        enc_result = haversine(enc_lon1, enc_lat1, enc_lon2, enc_lat2, consts)
+        enc_result = enc_haversine(enc_lon1, enc_lat1, enc_lon2, enc_lat2, consts)
         decrypted = enc_result.decrypt()[0]
 
-        def plain_haversine(lon1, lat1, lon2, lat2):
-            lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
-            dlon = lon2 - lon1
-            dlat = lat2 - lat1
-            a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-            c = 2 * math.asin(math.sqrt(a))
-            return 6371 * c
-
-        expected = plain_haversine(*place1, *place2)
+        expected = haversine(place1[::-1], place2[::-1], unit=Unit.KILOMETERS)
 
         self.assertAlmostEqual(decrypted, expected, delta=0.5)
 

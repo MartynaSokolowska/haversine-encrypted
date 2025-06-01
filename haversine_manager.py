@@ -1,7 +1,7 @@
 from encrypted_functions import *
 import gc
 
-def haversine(lon1, lat1, lon2, lat2, enc_consts):
+def enc_haversine(lon1, lat1, lon2, lat2, enc_consts):
     """
     Calculate the great circle distance in kilometers between two points
     on the earth (specified in decimal degrees)
@@ -23,13 +23,11 @@ def haversine(lon1, lat1, lon2, lat2, enc_consts):
     sin_dlat_sq = sin_dlat * sin_dlat
     del sin_dlat, dlat
     gc.collect()
-
     
     sin_dlon = calculator.enc_sin(dlon*enc_const_1_2)
     sin_dlon_sq = sin_dlon * sin_dlon
     del sin_dlon, dlon
     gc.collect()
-    
     
     cos_lat1 = calculator.enc_cos(lat1)
     cos_lat2 = calculator.enc_cos(lat2)
@@ -52,7 +50,6 @@ def haversine(lon1, lat1, lon2, lat2, enc_consts):
 
     enc_const_2 = enc_consts["2"]
     c = enc_const_2 * asin_val
-
     del asin_val
     gc.collect()
 
