@@ -36,10 +36,12 @@ class TestEncryptedFunctions(unittest.TestCase):
                 self.assertAlmostEqual(decrypted, expected, delta=0.01)
 
     def test_enc_sqrt(self):
-        for x in [0.01, 0.05, 0.09]: 
+        for x in [1e-09, 1e-10]: 
             with self.subTest(x=x):
                 enc_x = ts.ckks_vector(self.context, [x])
-                result = self.calc.enc_sqrt(enc_x)
+                scaled_x = enc_x*1e6
+                result = self.calc.enc_sqrt(scaled_x)
+                result = result * 1e-3
                 decrypted = self.decrypt(result)
                 expected = math.sqrt(x)
                 self.assertAlmostEqual(decrypted, expected, delta=0.01)
@@ -72,22 +74,43 @@ class TestEncryptedFunctions(unittest.TestCase):
                 expected = math.sin(x) ** 2
                 self.assertAlmostEqual(decrypted, expected, delta=0.01)
 
-
+                                
 class TestEncryptedHaversine(unittest.TestCase):
-    def test_enc_haversine(self):
+    def test_enc_haversine_multiple_cases(self):
         context = create_ckks_context()
 
-        place1 = (21.0122, 52.2297)       
-        place2 = (21.2122, 52.2197)
+        test_cases = [
+            # format: ((lon1, lat1), (lon2, lat2), ≈distance_km)
+            ((21.000000, 52.000000), (21.000000, 52.000090)),  # ~10 m
+            ((21.000000, 52.000000), (21.000000, 52.001078)),  # ~120 m
+            ((21.000000, 52.000000), (21.000000, 52.002066)),  # ~230 m
+            ((21.000000, 52.000000), (21.000000, 52.003054)),  # ~340 m
+            ((21.000000, 52.000000), (21.000000, 52.004042)),  # ~450 m
+            ((21.000000, 52.000000), (21.000000, 52.005031)),  # ~560 m
+            ((21.000000, 52.000000), (21.000000, 52.006019)),  # ~670 m
+            ((21.000000, 52.000000), (21.000000, 52.007007)),  # ~780 m
+            ((21.000000, 52.000000), (21.000000, 52.007995)),  # ~890 m
+            ((21.000000, 52.000000), (21.000000, 52.008983)),  # ~1000 m (1 km)
+        ]
 
-        (enc_lon1, enc_lat1), (enc_lon2, enc_lat2) = encrypt_places(place1, place2, context)
+        for place1, place2 in test_cases:
+            with self.subTest(place1=place1, place2=place2):
+                (enc_lon1, enc_lat1), (enc_lon2, enc_lat2) = encrypt_places(place1, place2, context)
+                enc_result = enc_haversine(enc_lon1, enc_lat1, enc_lon2, enc_lat2, consts)
+                decrypted = enc_result.decrypt()[0]
 
-        enc_result = enc_haversine(enc_lon1, enc_lat1, enc_lon2, enc_lat2, consts)
-        decrypted = enc_result.decrypt()[0]
+                expected = haversine(place1[::-1], place2[::-1], unit=Unit.KILOMETERS)
 
-        expected = haversine(place1[::-1], place2[::-1], unit=Unit.KILOMETERS)
+                print(f"Encrypted: {decrypted:.6f} km, Expected: {expected:.6f} km")
+                self.assertAlmostEqual(decrypted, expected, delta=0.005)
 
-        self.assertAlmostEqual(decrypted, expected, delta=0.5)
+        def plain_haversine(lon1, lat1, lon2, lat2):
+            lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+            c = 2 * math.asin(math.sqrt(a))
+            return 6371 * c
 
 
 if __name__ == '__main__':

@@ -37,10 +37,17 @@ def enc_haversine(lon1, lat1, lon2, lat2, enc_consts):
     a = sin_dlat_sq + (cos_lat1 * cos_lat2 * sin_dlon_sq)
     del sin_dlat_sq, sin_dlon_sq, cos_lat1, cos_lat2
     gc.collect()
+    # print("a: ", a.decrypt()[0])
 
-    scaled_a = a * 1e4
+    # Scale the input 'a' before applying the sqrt approximation.
+    # This improves numerical stability of the Chebyshev approximation.
+    # The approximation is designed for inputs in [1e-5, 1.5e-2] (from 0 to 1km), so we scale:
+    # - a * 1e6 to move the original domain [1e-11, 1.5e-8] → [1e-5, 1.5e-2]
+    # - After sqrt approximation, scale back by multiplying with 1e-2.
+    # This approach ensures reasonable accuracy for close distances.
+    scaled_a = a * 1e6
     sqrt_a = calculator.enc_sqrt(scaled_a)
-    sqrt_a = sqrt_a * 1e-2
+    sqrt_a = sqrt_a * 1e-3
     del a
     gc.collect()
 

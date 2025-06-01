@@ -6,5 +6,5 @@ y_vals = np.sqrt(x_vals)
 
 cheb = Chebyshev.fit(x_vals, y_vals, deg=5, domain=[0, 0.1])
 poly = cheb.convert(kind=np.polynomial.Polynomial)
-coeffs = poly.coef
-print(coeffs)
+
+print("coeffs:", poly.coef)
