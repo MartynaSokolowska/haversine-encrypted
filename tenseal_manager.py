@@ -23,8 +23,8 @@ def create_ckks_context():
             60, 40, 40, 40, 40, 40, 
             40, 40, 40, 40, 40, 40,
             40, 40, 40, 40, 40, 40, 
-            40, 60],
-        encryption_type = ts.ENCRYPTION_TYPE.SYMMETRIC
+            40, 40, 60],
+        encryption_type = ts.ENCRYPTION_TYPE.ASYMMETRIC
     )
     context.global_scale = 2**40
     return context
