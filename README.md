@@ -26,7 +26,7 @@ python tests.py
 
 `main.py` is uninportant at this moment but feel free to play around with it.
 
-## Configruation of ckks context
+## Configuration of ckks context
 
 Configuration of tenseal is in `tenseal_manager.py`. Most important parameters here are: 
 * poly_modulus_degree
