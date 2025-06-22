@@ -43,7 +43,7 @@ def enc_haversine(lon1, lat1, lon2, lat2, enc_consts):
     # This improves numerical stability of the Chebyshev approximation.
     # The approximation is designed for inputs in [1e-5, 1.5e-2] (from 0 to 1km), so we scale:
     # - a * 1e6 to move the original domain [1e-11, 1.5e-8] → [1e-5, 1.5e-2]
-    # - After sqrt approximation, scale back by multiplying with 1e-2.
+    # - After sqrt approximation, scale back by multiplying with 1e-3.
     # This approach ensures reasonable accuracy for close distances.
     scaled_a = a * 1e6
     sqrt_a = calculator.enc_sqrt(scaled_a)
